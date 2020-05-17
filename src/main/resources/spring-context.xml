@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+  http://www.springframework.org/schema/beans/spring-beans.xsd
+  http://www.springframework.org/schema/context
+  http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <bean id="server" class="sap.gb.spring.one.server.system.Server">
+        <constructor-arg ref="handlerExecutor"/>
+        <lookup-method name="createHandler" bean="handler"/>
+    </bean>
+
+    <bean id="authService" class="sap.gb.spring.one.server.execute.AuthService">
+        <constructor-arg ref="userRepo"/>
+    </bean>
+
+    <bean id="userRepo" class="sap.gb.spring.one.server.repo.UserRepo">
+        <constructor-arg ref="dataSource"/>
+    </bean>
+
+    <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+        <property name="driverClassName" value="org.postgresql.Driver"/>
+        <property name="url" value="jdbc:postgresql://localhost:5432/spring_chat"/>
+        <property name="username" value="mikhail"/>
+        <property name="password" value="123"/>
+    </bean>
+
+    <bean id="handlerExecutor" class="sap.gb.spring.one.server.execute.HandlerExecutor">
+    </bean>
+
+    <bean scope="prototype" id="handler" class="sap.gb.spring.one.server.execute.Handler">
+        <property name="authService" ref="authService"/>
+        <property name="registrar" ref="registrar"/>
+        <property name="messageSender" ref="messageSender"/>
+    </bean>
+
+    <bean id="registrar" class="sap.gb.spring.one.server.system.Registrar">
+        <constructor-arg ref="onlineUsers"/>
+    </bean>
+
+    <bean id="messageSender" class="sap.gb.spring.one.server.send.MessageSender">
+        <constructor-arg ref="registrar"/>
+    </bean>
+
+    <bean id="onlineUsers" class="java.util.concurrent.ConcurrentHashMap">
+    </bean>
+
+    <bean id="factoryPostProcessor" class="sap.gb.spring.one.server.exp.MyBeanFactoryPostProcessor">
+    </bean>
+    <bean id="messageBeanPostProcessor" class="sap.gb.spring.one.server.exp.MessageBeanPostProcessor">
+    </bean>
+    <bean id="postProcessMessage" class="sap.gb.spring.one.server.exp.PostProcessMessage">
+    </bean>
+
+</beans>
